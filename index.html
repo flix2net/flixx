@@ -1,101 +1,37 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Movie & TV Series Search</title>
-    <style>
-        /* Add your CSS styles here */
-    </style>
-</head>
-<body>
-    <header>
-        <h1>Movie & TV Series Search</h1>
-        <input type="text" id="searchInput" placeholder="Search for a movie or TV series">
-        <button id="searchButton">Search</button>
-    </header>
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
 
-    <main>
-        <div id="searchResults" class="results-container"></div>
-        <div id="contentFrame" class="content-frame">
-            <iframe id="embedFrame" width="100%" height="100%" frameborder="0" allowfullscreen></iframe>
-        </div>
-    </main>
+header {
+  background-color: #333;
+  color: white;
+  text-align: center;
+  padding: 20px;
+}
 
-    <script>
-        const apiKey = "683265ee537211df26d8125e4759ea32"; // Replace with your TMDB API key
-        const searchInput = document.getElementById("searchInput");
-        const searchButton = document.getElementById("searchButton");
-        const searchResults = document.getElementById("searchResults");
-        const embedFrame = document.getElementById("embedFrame");
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
 
-        searchButton.addEventListener("click", () => {
-            const searchQuery = searchInput.value.trim();
-            if (!searchQuery) {
-                alert("Please enter a search query.");
-                return;
-            }
+table, th, td {
+  border: 1px solid #ddd;
+}
 
-            const apiUrl = `https://api.themoviedb.org/3/search/multi?api_key=${apiKey}&query=${searchQuery}`;
+th, td {
+  padding: 8px;
+  text-align: left;
+}
 
-            fetch(apiUrl)
-                .then((response) => response.json())
-                .then((data) => {
-                    searchResults.innerHTML = ""; // Clear previous results
+tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
 
-                    if (data.results && data.results.length > 0) {
-                        data.results.forEach((item) => {
-                            if (item.poster_path) {
-                                const resultItem = document.createElement("div");
-                                resultItem.classList.add("result-item");
-                                resultItem.setAttribute("data-id", item.id);
-                                resultItem.setAttribute("data-type", item.media_type);
-
-                                const posterUrl = `https://image.tmdb.org/t/p/w185${item.poster_path}`;
-                                const poster = document.createElement("img");
-                                poster.src = posterUrl;
-                                poster.alt = item.title || item.name;
-
-                                const title = document.createElement("h3");
-                                title.textContent = item.title || item.name;
-
-                                resultItem.appendChild(poster);
-                                resultItem.appendChild(title);
-                                searchResults.appendChild(resultItem);
-
-                                resultItem.addEventListener("click", () => {
-                                    displayContentInIframe(item.id, item.media_type);
-                                });
-                            }
-                        });
-                    } else {
-                        searchResults.textContent = "No results found.";
-                    }
-                })
-                .catch((error) => {
-                    console.error("Error fetching data:", error);
-                    searchResults.textContent = "An error occurred while fetching data.";
-                });
-        });
-
-        function displayContentInIframe(id, type) {
-            const detailApiUrl = `https://api.themoviedb.org/3/${type}/${id}?api_key=${apiKey}`;
-
-            fetch(detailApiUrl)
-                .then((response) => response.json())
-                .then((data) => {
-                    if (data.videos && data.videos.results.length > 0) {
-                        const videoKey = data.videos.results[0].key;
-                        const embedUrl = `https://autoembed.to/${type}/tmdb/${id}?server=2&video_key=${videoKey}`;
-                        embedFrame.src = embedUrl;
-                    } else {
-                        embedFrame.src = ""; // Clear the iframe if no videos are available
-                    }
-                })
-                .catch((error) => {
-                    console.error("Error fetching content details:", error);
-                });
-        }
-    </script>
-</body>
-</html>
+iframe {
+  width: 100%;
+  height: 500px;
+  display: none;
+}
