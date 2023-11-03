@@ -1,54 +1,46 @@
-const apiKey = '683265ee537211df26d8125e4759ea32';
-const searchButton = document.getElementById('search-button');
-const searchInput = document.getElementById('search-input');
-const resultsTable = document.getElementById('results-table');
-const iframe = document.getElementById('iframe');
+<script>
+  const apiKey = "683265ee537211df26d8125e4759ea32";
 
-searchButton.addEventListener('click', () => {
-  const query = searchInput.value;
-  searchMoviesAndShows(query);
-});
+  // Function to handle form submission
+  function searchMoviesAndShows() {
+    const query = document.getElementById("search-input").value;
 
-function searchMoviesAndShows(query) {
-  // Make an API request to TMDb to search for movies and TV shows.
-  // Handle the results and display them in the table.
-  // Use the provided iframe URLs to play the selected content.
-}
+    // Make a request to search movies and shows using the TMDB API
+    fetch(https://api.themoviedb.org/3/search/multi?api_key=${apiKey}&query=${query})
+      .then(response => response.json())
+      .then(data => {
+        // Clear previous search results
+        const tableBody = document.getElementById("results-table-body");
+        tableBody.innerHTML = "";
 
-function displayResults(results) {
-  // Clear previous results
-  resultsTable.innerHTML = '';
+        // Loop through the search results and add rows to the table
+        data.results.forEach(result => {
+          const row = document.createElement("tr");
 
-  // Loop through the results and add them to the table
-  results.forEach((result) => {
-    const row = resultsTable.insertRow();
-    const titleCell = row.insertCell(0);
-    const posterCell = row.insertCell(1);
-    const actionCell = row.insertCell(2);
+          // Add image and title columns
+          const imageColumn = document.createElement("td");
+          const image = document.createElement("img");
+          image.src = https://image.tmdb.org/t/p/w200${result.poster_path};
+          imageColumn.appendChild(image);
+          row.appendChild(imageColumn);
 
-    titleCell.textContent = result.title;
-    posterCell.innerHTML = `<img src="https://image.tmdb.org/t/p/w185/${result.poster_path}" alt="${result.title} Poster">`;
+          const titleColumn = document.createElement("td");
+          titleColumn.textContent = result.title || result.name;
+          row.appendChild(titleColumn);
 
-    // Create a button to play the content in the iframe
-    const playButton = document.createElement('button');
-    playButton.textContent = 'Watch';
-    playButton.addEventListener('click', () => {
-      // Set the iframe source to the selected movie or TV show
-      iframe.src = getIframeURL(result);
-      iframe.style.display = 'block';
-    });
+          // Add watch column with iframe based on TMDB ID
+          const watchColumn = document.createElement("td");
+          const watchLink = document.createElement("a");
+          watchLink.href = https://autoembed.to/${result.media_type === "movie" ? "movie" : "tv"}/tmdb/${result.id};
+          watchLink.target = "_blank";
+          watchLink.textContent = "Watch";
+          watchColumn.appendChild(watchLink);
+          row.appendChild(watchColumn);
 
-    actionCell.appendChild(playButton);
-  });
-}
-
-function getIframeURL(result) {
-  if (result.media_type === 'movie') {
-    return `https://autoembed.to/movie/tmdb/${result.id}`;
-  } else if (result.media_type === 'tv') {
-    // You can prompt the user to select season and episode here
-    const season = prompt('Enter Season Number:');
-    const episode = prompt('Enter Episode Number:');
-    return `https://autoembed.to/tv/tmdb/${result.id}-${season}-${episode}`;
+          // Add row to the table
+          tableBody.appendChild(row);
+        });
+      })
+      .catch(error => console.error(error));
   }
-}
+</script>
