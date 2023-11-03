@@ -1,28 +1,19 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Movie and TV Show Search</title>
-  <link rel="stylesheet" type="text/css" href="styles.css">
-</head>
 <body>
-  <header>
-    <h1>Movie and TV Show Search</h1>
-    <input type="text" id="search-input" placeholder="Search for movies and TV shows">
-    <button id="search-button">Search</button>
-  </header>
-  <div id="results">
-    <table>
-      <thead>
-        <tr>
-          <th>Title</th>
-          <th>Poster</th>
-          <th>Action</th>
-        </tr>
-      </thead>
-      <tbody id="results-table"></tbody>
-    </table>
-  </div>
-  <iframe id="iframe" src="" frameborder="0" allowfullscreen></iframe>
-  <script src="script.js"></script>
+  <h1>Search Movies and TV Shows</h1>
+
+  <form onsubmit="event.preventDefault(); searchMoviesAndShows();">
+    <input type="text" id="search-input" placeholder="Search movies and shows..." required>
+    <button type="submit">Search</button>
+  </form>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Image</th>
+        <th>Title</th>
+        <th>Watch</th>
+      </tr>
+    </thead>
+    <tbody id="results-table-body"></tbody>
+  </table>
 </body>
-</html>
