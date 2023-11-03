@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Movie & TV Series Search</title>
-    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Add your CSS styles here */
+    </style>
 </head>
 <body>
     <header>
@@ -20,6 +22,80 @@
         </div>
     </main>
 
-    <script src="script.js"></script>
+    <script>
+        const apiKey = "683265ee537211df26d8125e4759ea32"; // Replace with your TMDB API key
+        const searchInput = document.getElementById("searchInput");
+        const searchButton = document.getElementById("searchButton");
+        const searchResults = document.getElementById("searchResults");
+        const embedFrame = document.getElementById("embedFrame");
+
+        searchButton.addEventListener("click", () => {
+            const searchQuery = searchInput.value.trim();
+            if (!searchQuery) {
+                alert("Please enter a search query.");
+                return;
+            }
+
+            const apiUrl = `https://api.themoviedb.org/3/search/multi?api_key=${apiKey}&query=${searchQuery}`;
+
+            fetch(apiUrl)
+                .then((response) => response.json())
+                .then((data) => {
+                    searchResults.innerHTML = ""; // Clear previous results
+
+                    if (data.results && data.results.length > 0) {
+                        data.results.forEach((item) => {
+                            if (item.poster_path) {
+                                const resultItem = document.createElement("div");
+                                resultItem.classList.add("result-item");
+                                resultItem.setAttribute("data-id", item.id);
+                                resultItem.setAttribute("data-type", item.media_type);
+
+                                const posterUrl = `https://image.tmdb.org/t/p/w185${item.poster_path}`;
+                                const poster = document.createElement("img");
+                                poster.src = posterUrl;
+                                poster.alt = item.title || item.name;
+
+                                const title = document.createElement("h3");
+                                title.textContent = item.title || item.name;
+
+                                resultItem.appendChild(poster);
+                                resultItem.appendChild(title);
+                                searchResults.appendChild(resultItem);
+
+                                resultItem.addEventListener("click", () => {
+                                    displayContentInIframe(item.id, item.media_type);
+                                });
+                            }
+                        });
+                    } else {
+                        searchResults.textContent = "No results found.";
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error fetching data:", error);
+                    searchResults.textContent = "An error occurred while fetching data.";
+                });
+        });
+
+        function displayContentInIframe(id, type) {
+            const detailApiUrl = `https://api.themoviedb.org/3/${type}/${id}?api_key=${apiKey}`;
+
+            fetch(detailApiUrl)
+                .then((response) => response.json())
+                .then((data) => {
+                    if (data.videos && data.videos.results.length > 0) {
+                        const videoKey = data.videos.results[0].key;
+                        const embedUrl = `https://autoembed.to/${type}/tmdb/${id}?server=2&video_key=${videoKey}`;
+                        embedFrame.src = embedUrl;
+                    } else {
+                        embedFrame.src = ""; // Clear the iframe if no videos are available
+                    }
+                })
+                .catch((error) => {
+                    console.error("Error fetching content details:", error);
+                });
+        }
+    </script>
 </body>
 </html>
